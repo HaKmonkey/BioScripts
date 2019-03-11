@@ -68,147 +68,174 @@ for i in range(len(blast)):
 # Parsing Query Chunks #
 ########################
 
-'''
-query = ""
-start_sig = None
-end_sig = None
-
-for i in range(len(start_chunk)):
-  for j in range(start_chunk[i], end_chunk[i] + 1):
-    if re.match(r'Query= ', blast[j]):
-      query = str(blast[j])
-    if re.match(r'\[\'Sequences producing significant alignments', blast[j]):
-      start_sig = j
-    if re.match(r'\[\'\> ', blast[j]):
-      end_sig = j
-'''
-
-##############################################################
-# Getting the Query and Significant Alignment Sequences TEST #
-##############################################################
-
-query = ""
-start_sig = None
-end_sig = None
-
-for j in range(start_chunk[0], end_chunk[0]+1):
-  if re.match(r'\[\'Query= ', str(blast[j])):
-      query = str(blast[j])
-  if re.match(r'\[\'Sequences producing significant alignments', str(blast[j])):
-    start_sig = j
-  if re.match(r'\[\'\> ', str(blast[j])):
-    end_sig = j
-    break
-
-##################################
-# Finding Hits Per Sequence TEST #
-##################################
-
-seq = [] # For sequences column
-hits = []
-x = False
-
-for k in range(start_chunk[0], end_chunk[0]+1):
-  if re.match(r'\[\'\> ', str(blast[k])):
-    seq.append(str(blast[k]))
-    x = True
-    continue
-  while x:
-    if re.match(r'\[\'\> ', str(blast[k])) or k == end_chunk[0]:
-      x = False
-      hits.append(" ")
-      k += 1
-    else:
-      hits.append(str(blast[k]))
-      k += 1
-
-##############################
-# Pulling Hits and Gaps TEST #
-##############################
-
-match = [] 
-gaps = []
-length = []
-
-for i in range(len(hits)):
-  temp_m = str(re.findall(r'Identities = [0-9]+/[0-9]+ \(([0-9]+)\%\)', hits[i]))
-  temp_m = temp_m[2:len(temp_m)-2]
-  match.append(temp_m)
-  temp_g = str(re.findall(r'Gaps = [0-9]+/[0-9]+ \(([0-9]+)\%\)', hits[i]))
-  temp_g = temp_g[2:len(temp_g)-2]
-  gaps.append(temp_g)
-  temp_l = str(re.findall(r'Identities = [0-9]+/([0-9]+) \([0-9]+\%\)', hits[i]))
-  temp_l = temp_l[2:len(temp_l)-2]
-  length.append(temp_l)
-
-
-#################
-# Grouping TEST #
-#################
-
-# match and gap % grouped by which sequence they hit
-matchp = list(splitz(match, '')) # for avg match % column
-gapp = list(splitz(gaps, '')) # for avg gap % column
-length = list(splitz(length, '')) # for avg hit length column
-num_hits = [] # for the hits column
-
-# gets the mean for each group
-for i in range(len(matchp)):
-  matchp[i] = [int(x) for x in matchp[i]]
-  num_hits.append(len(matchp[i]))
-  matchp[i] = np.mean(matchp[i])
-  gapp[i] = [int(x) for x in gapp[i]]
-  gapp[i] = np.mean(gapp[i])
-  length[i] = [int(x) for x in length[i]]
-  length[i] = np.mean(length[i])
-
-#########################
-# Printing a Table TEST #
-#########################
-
-t = Table()
-#t['Sequence'] = seq
-t['Hits'] = num_hits
-t['Avg. Hit Length'] = length
-t['Avg. Match %'] = matchp
-t['Avg. Gaps %'] = gapp
-#t['Best']
-
-print(seq)
-print(num_hits)
-print(length)
-print(matchp)
-print(gapp)
-print(" ")
-
-print(t)
-
-# Table
-## Query
-## Sequence(s) that hit
-### If more than one sequence, list which is better (higher bit score)
-## Number of hits for each sequence
-## Average % match and gaps for each sequence
-## Average Length of hits
-
-
-# NODE_1
-#
-# | Sequence    | Hits | Avg Hit Length | Avg Match % | Avg Gap % | Best |
-# | ----------- | ---- | -------------- | ----------- | --------- | ---- |
-# | Pseudomonas | 135  | 40000          | 95%         | 0.5%      | X    |
-# | Annandia    | 5    | 60             | 90%         | 1%        |      |
-
-
-'''
 file = open("parsed_blast.txt","w")
 
-# writing everything but the footer
-for i in range(len(blast)-6):
-  temp = str(blast[i])
-  blast[i] = temp[2:len(temp)-2]
-  file.write(str(blast[i]))
+for i in range(len(start_chunk)):
+
+  #########################################################
+  # Getting the Query and Significant Alignment Sequences #
+  #########################################################
+
+  query = ""
+  start_sig = None
+  end_sig = None
+
+  for j in range(start_chunk[i], end_chunk[i]+1):
+    if re.match(r'\[\'Query= ', str(blast[j])):
+      query = str(blast[j])
+      query = query[2:len(query)-2]
+    if re.match(r'\[\'Sequences producing significant alignments', str(blast[j])):
+      start_sig = j
+    if re.match(r'\[\'\> ', str(blast[j])):
+      end_sig = j
+      break
+  
+  #############################
+  # Finding Hits Per Sequence #
+  #############################
+  
+  seq = [] # For sequences column
+  hits = []
+  x = False
+
+  for j in range(start_chunk[i], end_chunk[i]+1):
+    if re.match(r'\[\'\> ', str(blast[j])):
+      temp_s = str(blast[j])
+      temp_s = temp_s[4:len(temp_s)-2]
+      seq.append(temp_s)
+      x = True
+      continue
+    while x:
+      if re.match(r'\[\'\> ', str(blast[j])) or j == end_chunk[i]:
+        x = False
+        hits.append(" ")
+        j += 1
+      else:
+        hits.append(str(blast[j]))
+        j += 1
+  
+  #########################
+  # Pulling Hits and Gaps #
+  #########################
+  
+  match = [] 
+  gaps = []
+  length = []
+
+  for j in range(len(hits)):
+    temp_m = str(re.findall(r'Identities = [0-9]+/[0-9]+ \(([0-9]+)\%\)', hits[j]))
+    temp_m = temp_m[2:len(temp_m)-2]
+    match.append(temp_m)
+    temp_g = str(re.findall(r'Gaps = [0-9]+/[0-9]+ \(([0-9]+)\%\)', hits[j]))
+    temp_g = temp_g[2:len(temp_g)-2]
+    gaps.append(temp_g)
+    temp_l = str(re.findall(r'Identities = [0-9]+/([0-9]+) \([0-9]+\%\)', hits[j]))
+    temp_l = temp_l[2:len(temp_l)-2]
+    length.append(temp_l) 
+
+  ############
+  # Grouping #
+  ############
+
+  # match and gap % grouped by which sequence they hit
+  matchp = list(splitz(match, '')) # for avg match % column
+  gapp = list(splitz(gaps, '')) # for avg gap % column
+  length = list(splitz(length, '')) # for avg hit length column
+  num_hits = [] # for the hits column
+
+  # gets the mean for each group
+  for j in range(len(matchp)):
+    matchp[j] = [int(x) for x in matchp[j]]
+    num_hits.append(len(matchp[j]))
+    matchp[j] = np.around(np.mean(matchp[j]), decimals = 3)
+    gapp[j] = [int(x) for x in gapp[j]]
+    gapp[j] = np.around(np.mean(gapp[j]), decimals = 3)
+    length[j] = [int(x) for x in length[j]]
+    length[j] = np.around(np.mean(length[j]), decimals = 3)
+
+  ####################
+  # Printing a Table #
+  ####################
+
+  header1 = "Sequence" + " " * (len(max(seq, key=len))-8)
+  header2 = "Hits" + " " * (len(max(str(num_hits), key=len))-5)
+  header3 = "Avg. Hit Length" + " " * (len(max(str(length), key=len))-15)
+  header4 = "Avg. Match %" + " " * (len(max(str(matchp), key=len))-12)
+  header5 = "Avg. Gaps %" + " " * (len(max(str(gapp), key=len))-11)
+
+  if len(header1) > len(max(seq, key=len)):
+    sep1 = '-' * len(header1)
+  else:
+    sep1 = '-' * len(max(seq, key=len))
+  
+  if len(header2) > len(max(str(num_hits), key=len)):
+    sep2 = '-' * len(header2)
+  else:
+    sep2 = '-' * len(max(str(num_hits), key=len))
+  
+  if len(header3) > len(max(str(length), key=len)):
+    sep3 = '-' * len(header3)
+  else:
+    sep3 = '-' * len(max(str(length), key=len))
+  
+  if len(header4) > len(max(str(matchp), key=len)):
+    sep4 = '-' * len(header4)
+  else:
+    sep4 = '-' * len(max(str(matchp), key=len))
+  
+  if len(header5) > len(max(str(gapp), key=len)):
+    sep5 = '-' * len(header5)
+  else:
+    sep5 = '-' * len(max(str(gapp), key=len))
+
+  file.write(query)
+  file.write("\n\n")
+
+  file.write("|\t")
+  file.write(header1)
+  file.write("\t|\t")
+  file.write(header2)
+  file.write("\t|\t")
+  file.write(header3)
+  file.write("\t|\t")
+  file.write(header4)
+  file.write("\t|\t")
+  file.write(header5)
+  file.write("\t|")
   file.write("\n")
 
+  file.write("|\t")
+  file.write(sep1)
+  file.write("\t|\t")
+  file.write(sep2)
+  file.write("\t|\t")
+  file.write(sep3)
+  file.write("\t|\t")
+  file.write(sep4)
+  file.write("\t|\t")
+  file.write(sep5)
+  file.write("\t|")
+  file.write("\n")
+
+  for j in range(len(seq)):  
+    file.write("|\t")
+    file.write(str(seq[j]))
+    file.write(" " * (len(header1) - len(str(seq[j]))))
+    file.write("\t|\t")
+    file.write(str(num_hits[j]))
+    file.write(" " * (len(header2) - len(str(num_hits[j]))))
+    file.write("\t|\t")
+    file.write(str(length[j]))
+    file.write(" " * (len(header3) - len(str(length[j]))))
+    file.write("\t|\t")
+    file.write(str(matchp[j]))
+    file.write(" " * (len(header4) - len(str(matchp[j]))))
+    file.write("\t|\t")
+    file.write(str(gapp[j]))
+    file.write(" " * (len(header5) - len(str(gapp[j]))))
+    file.write("\t|")
+    file.write("\n")
+
+  file.write("\n\n\n")    
+ 
 file.close()
-'''
