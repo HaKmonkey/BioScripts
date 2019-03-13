@@ -163,30 +163,11 @@ for i in range(len(start_chunk)):
   header4 = "Avg. Match %" + " " * (len(max(str(matchp), key=len))-12)
   header5 = "Avg. Gaps %" + " " * (len(max(str(gapp), key=len))-11)
 
-  if len(header1) > len(max(seq, key=len)):
-    sep1 = '-' * len(header1)
-  else:
-    sep1 = '-' * len(max(seq, key=len))
-  
-  if len(header2) > len(max(str(num_hits), key=len)):
-    sep2 = '-' * len(header2)
-  else:
-    sep2 = '-' * len(max(str(num_hits), key=len))
-  
-  if len(header3) > len(max(str(length), key=len)):
-    sep3 = '-' * len(header3)
-  else:
-    sep3 = '-' * len(max(str(length), key=len))
-  
-  if len(header4) > len(max(str(matchp), key=len)):
-    sep4 = '-' * len(header4)
-  else:
-    sep4 = '-' * len(max(str(matchp), key=len))
-  
-  if len(header5) > len(max(str(gapp), key=len)):
-    sep5 = '-' * len(header5)
-  else:
-    sep5 = '-' * len(max(str(gapp), key=len))
+  sep1 = '-' * len(header1)
+  sep2 = '-' * len(header2)
+  sep3 = '-' * len(header3)
+  sep4 = '-' * len(header4)
+  sep5 = '-' * len(header5)
 
   file.write(query)
   file.write("\n\n")
