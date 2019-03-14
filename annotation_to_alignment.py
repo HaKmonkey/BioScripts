@@ -522,29 +522,9 @@ file = open("a2a.gff", "w")
 
 # Writing the header to the `.gff` file
 file.write("##gff-version 3 \n")
-'''
+
 for i in range(len(samNodes)):
   file.write("##sequence-region\t" + samNodes[i] + "\t1\t" + str(len(samSeqs[i])) + "\n")
-
-print(len(info))
-'''
-
-## SOME FEATURES ARE WAY OUTSIDE THE BOUNDS OF THE ALIGNMENT
-# - Check `a2a.gff`
-# - Check Adjusting Features
-## newNodes has the correct nodes and duplicates...
-## info has the correct indexes and duplicates as well
-## seeing 40 NODE_22_p1 instead of 20...
-
-#for i in range(len(newNodes)):
-  #print(newNodes[i])
-
-#print(newNodes[127])
-
-#print(len(samSeqs))
-#print(len(newNodes))
-#print(newNodes[146])
-#print(newNodes[166])
 
 # Adjusting starts and ends of gene features to match alignment
 for i in range(len(samSeqs)):
@@ -553,18 +533,7 @@ for i in range(len(samSeqs)):
     temp = info[j]
     index = temp[0]
     if newNodes[j] == samNodes[i]:
-      #print(samNodes[i])
-      #print(j)
-      ## NODE_22_p1 give 40 instead of 20
-      ## NODE_112_p1 gives 33 instead of 25
-      ## NODE_312_p1 gives 30 instead of 16
-      ## NODE_1108 gives 19 instead of 12
-      ## NODE_1297_ gives 81 instead of 11
-      ## NODE_2333_ gives 6 instead of 7
-      ## NODE_3154_, NODE_3811_, NODE_6448_, NODE_6540_, NODE_13192_, NODE_22013_, NODE_43464_ not showing hits
-      #print(samStarts[i])
       newStarts[j] = int(newStarts[j]) + samStarts[i]
-      #print(newStarts[index])
       newEnds[j] = int(newEnds[j]) + samStarts[i]
 
 #for i in range(len(newStarts)):
@@ -573,8 +542,8 @@ for i in range(len(samSeqs)):
 # Writing the features to the `.gff` files
 for i in range(len(newNodes)):
   if (i in emp) == False:
-    file.write(newNodes[i] + "\ta2a\t" + newTypes[i] + "\t" + str(newStarts[i]) + "\t" + str(newEnds[i]) + "\t" + str(newScores[i]) + "\t" + newStrands[i] + "\t" + str(newPhases[i]) + "\t" + newID[i] + newGenes[i] + "\n")
-'''
+    file.write(newNodes[i] + "\ta2a\t" + newTypes[i] + "\t" + str(newStarts[i]) + "\t" + str(newEnds[i]) + "\t" + str(newScores[i]) + "\t" + newStrands[i] + "\t" + str(newPhases[i]) + "\t" + newID[i] + newGenes[i] + ";colour= 255 0 0" + "\n")
+
 # Writing the ##FASTA section to the file
 file.write("##FASTA \n")
 
@@ -587,6 +556,6 @@ for i in range(len(samNodes)):
 
 # Cleaning up temporary lists
 del temp
-'''
+
 # Closing the new `.gff` file
 file.close()
