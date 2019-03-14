@@ -77,7 +77,10 @@ also automatically adds red color to putative node annotations.
 ```{bash}
 python3 putative_vs_reference.sam prokka.gff
 ```
+Before:
 
 ![Before](.readme_images/annotation_error.png)
+
+After:
 
 ![After](.readme_images/annotation_to_alignment.png)
