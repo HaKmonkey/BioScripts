@@ -524,20 +524,43 @@ file = open("a2a.gff", "w")
 file.write("##gff-version 3 \n")
 
 for i in range(len(samNodes)):
-  file.write("##sequence-region\t" + samNodes[i] + "\t1\t" + str(len(samSeqs[i])) + "\n")
+  file.write("##sequence-region\t" + samNodes[i] + "\t" + str(samStarts[i]) + "\t" + str(samEnds[i]) + "\n")
 
 # Adjusting starts and ends of gene features to match alignment
 for i in range(len(samSeqs)):
-  #print(samNodes[i])
   for j in range(len(newNodes)):
-    temp = info[j]
-    index = temp[0]
     if newNodes[j] == samNodes[i]:
       newStarts[j] = int(newStarts[j]) + samStarts[i]
       newEnds[j] = int(newEnds[j]) + samStarts[i]
 
-#for i in range(len(newStarts)):
-  #print(newStarts[i])
+# Correcting features that are suppose to be mapped in reverse
+for i in range(len(samFlags)):
+  for j in range(len(newNodes)):
+    if newNodes[j] == samNodes[i] and samFlags[i] == '16':
+      print(newNodes[j])
+      start = newStarts[j]
+      end = newEnds[j]
+      gene_length = end + 1 - start
+      print(gene_length)
+      node_length = samEnds[i] + 1 - samStarts[i]
+      print(node_length)
+      shift = start - samStarts[i]
+      print(shift)
+      flip = node_length - shift
+      print(flip)
+      end = flip + samStarts[i]
+      print(end)
+      start = end - gene_length
+      print(start)
+      newStarts[j] = start
+      newEnds[j] = end
+
+del start
+del end
+del gene_length
+del node_length
+del shift
+del flip
 
 # Writing the features to the `.gff` files
 for i in range(len(newNodes)):
@@ -545,17 +568,17 @@ for i in range(len(newNodes)):
     file.write(newNodes[i] + "\ta2a\t" + newTypes[i] + "\t" + str(newStarts[i]) + "\t" + str(newEnds[i]) + "\t" + str(newScores[i]) + "\t" + newStrands[i] + "\t" + str(newPhases[i]) + "\t" + newID[i] + newGenes[i] + ";colour= 255 0 0" + "\n")
 
 # Writing the ##FASTA section to the file
-file.write("##FASTA \n")
+#file.write("##FASTA \n")
 
 # Wtiring node names and sequences to the file
-for i in range(len(samNodes)):
-  file.write(">" + samNodes[i] + "\n")
-  temp = mod_seq[i]
-  for j in range(0,len(temp), 60):
-    file.write(temp[j:j+60] + "\n")
+#for i in range(len(samNodes)):
+  #file.write(">" + samNodes[i] + "\n")
+  #temp = mod_seq[i]
+  #for j in range(0,len(temp), 60):
+    #file.write(temp[j:j+60] + "\n")
 
 # Cleaning up temporary lists
-del temp
+#del temp
 
 # Closing the new `.gff` file
 file.close()
